@@ -1,0 +1,204 @@
+package com.company;
+
+import java.util.Scanner;
+
+public class Main {
+
+
+    private static final char X = 'X';
+    private static final char O = 'O';
+    private static final char empty = '*';
+    private static final int size = 4;
+    public static final int motionFlag = 0;
+    public static final char[][] map = new char[size][size];
+    public static void PrintMap(char[][] arr) { // print map
+        for (int i = 0; i < arr.length; i++) {
+            for (int k = 0; k < arr.length; k++) {
+                System.out.print(" "+ arr[i][k] + " ");
+            }
+            System.out.println();
+        }
+    }
+    public static void Print(char[][] arr) { // create map
+        char a = '0';
+        int p = 0;
+        arr[0][0] = 0;
+        while(p < arr.length) {
+            arr[0][p] = a;
+            arr[p][0] = a;
+            a++;
+            p++;
+        }
+        for (int i = 1; i < arr.length; i++) {
+            for (int k = 1; k < arr.length; k++) {
+                if (i != 0 && k != 0) {
+                    arr[i][k] = empty;
+                }
+            }
+        }
+        return;
+    }
+    private static void Startgame() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("play ? " +
+                " 1(yes) / 0 (no)");
+        int guest = scanner.nextInt();
+        System.out.println();
+        if (guest == 1) {
+            return;
+        } else if (guest == 0) {
+            System.out.println("bye");
+            System.exit(1);
+        } else {
+            System.out.println("incorrect data");
+            System.exit(1);
+        }
+        scanner.close();
+    }
+    public static void guestDynamic() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("your motion " +
+                " enter 2 coordinates " +
+                " first Y and second X ");
+        int guestMotionY = scanner.nextInt();
+        int guestMotionX = scanner.nextInt();
+        if ((guestMotionX < map.length && guestMotionX > 0) && (guestMotionY < map.length && guestMotionY > 0)) {
+
+            guestMap(guestMotionY , guestMotionX ); // date using in arr
+        } else {
+            System.out.println("incorrect data" +
+                    "try again");
+            guestDynamic();
+        }
+    }
+    public static void guestMap( int y , int x) {
+        map[y][x] = X;
+        CheckWin(y , x);
+    }
+    public static void CheckWin(int y , int x) {  //  проверка победы
+        int i = 1;
+        while (i != 4) {
+            if ((map[i][1] == map[i][2]) && (map[i][1] == map[i][3]) && map[i][1] == map[y][x]) {     // horizontal
+                if (map[y][x] == X) {
+                    System.out.println("You won");
+                    PrintMap(map);
+                    System.exit(0);
+                } else {
+                    System.out.println("You lose");
+                    PrintMap(map);
+                    System.exit(0);
+                }
+            } else if ((map[1][i] == map[2][i]) && (map[1][i] == map[3][i]) && map[1][i] == map[y][x]) { // vertical
+                if (map[y][x] == X) {
+                    System.out.println("You won");
+                    PrintMap(map);
+                    System.exit(0);
+                } else {
+                    System.out.println("You lose");
+                    PrintMap(map);
+                    System.exit(0);
+                }
+            } else
+                i++;
+        }
+        if (((map[1][1] == map[2][2]) && (map[2][2] == map[3][3]) ||
+                ((map[1][3] == map[2][2]) && (map[2][2] == map[3][1]))) && map[2][2] == map[y][x]) {
+            if (map[y][x] == X) {
+                System.out.println("You won");
+                PrintMap(map);
+                System.exit(0);
+            } else {
+                System.out.println("You lose");
+                PrintMap(map);
+                System.exit(0);
+            }
+        }
+        if ((map[1][1] != empty) && (map[1][2] != empty) && (map[1][3] != empty) && (map[2][1] != empty) &&     // ничья
+                (map[2][2] != empty) && (map[2][3]!= empty) && (map[3][1]!= empty) && (map[3][2] != empty) &&
+                (map[3][3] != empty)) {
+            System.out.println("Game over");
+            System.exit(0);
+        }
+        if (map[y][x] == X) {
+            MotionComputer();
+        } else {
+            guestDynamic();
+        }
+    }
+    public static void MotionComputer() {
+
+        if (map[3][3] == empty ) {    // 1 способ
+            map[3][3] = O;
+            PrintMap(map);
+            CheckWin(3, 3);
+        }  else if (map[2][2] != O) {       // 4 условия
+            if (map[1][2] == X) {
+                map[3][2] = O;
+                PrintMap(map);
+                CheckWin(3, 2);
+            } else if (map[3][2] == X) {
+                map[1][2] = O;
+                PrintMap(map);
+                CheckWin(1, 2);
+            } else if (map[2][1] == X) {    // добавить еще
+                map[2][3] = O;
+                PrintMap(map);
+                CheckWin(2, 3);
+            } else if (map[2][3] == X) {
+                map[2][1] = O;
+                PrintMap(map);
+                CheckWin(2, 1);
+            }
+        } else if (map[3][2] == O && map[2][3] == O) {
+            map[1][3] = O;
+            PrintMap(map);
+            CheckWin(1, 3);
+        }
+        else if (map[3][1] == empty ) {
+            map[3][1] = O;
+            PrintMap(map);
+            CheckWin(3, 1);
+        } else if ((map[1][1] == empty) || (map[1][3] == empty))  {
+            if (map[1][1] == empty) {
+                map[1][1] = O;
+                PrintMap(map);
+                CheckWin(1, 1);
+            } else {
+                map[1][3] = O;
+                PrintMap(map);
+                CheckWin(1, 3);
+            }
+        } if (map[2][2] == empty) {
+            map[2][2] = O;
+            PrintMap(map);
+            CheckWin(2,2);
+        } else if (map[3][2] == empty || map[1][2] == empty) {
+            if (map[3][2] == empty) {
+                map[3][2] = O;
+                PrintMap(map);
+                CheckWin(3, 2);
+            } else {
+                map[1][2] = O;
+                PrintMap(map);
+                CheckWin(1, 2);
+            }
+        } else if (map[2][3] == empty || map[2][1] == empty) {
+            if (map[2][3] == empty) {
+                map[2][3] = O;
+                PrintMap(map);
+                CheckWin(2, 3);
+            } else {
+                map[2][1] = O;
+                PrintMap(map);
+                CheckWin(2, 1);
+            }
+        }
+    }
+    public static void main(String[] args) {
+        Startgame();
+        Print(map);
+        PrintMap(map);
+        System.out.println();
+        guestDynamic();
+    }
+}
